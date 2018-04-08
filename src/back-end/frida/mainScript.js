@@ -8,7 +8,6 @@ var path_node = "C:\\Program Files\\nodejs\\node.exe";
 var path = path_node;
 
 var source = fs.readFileSync('./src/back-end/frida/injectedScript.js', 'utf8');
-
 var functions = {
     eval: {
         intercept: true,
