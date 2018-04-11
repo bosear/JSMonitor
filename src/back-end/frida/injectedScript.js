@@ -48,6 +48,9 @@ function init() {
 function onEnterToEval(args) {
     var str = '';
     var stringPointer = Memory.readPointer(args[1]);
+
+    //console.log(Memory.readUtf16String(Memory.readPointer(Memory.readPointer(stringPointer.add(23)).add(23)).add(23)));
+
     var stringObj = getStringObject(stringPointer);
     send({
         type: "call",

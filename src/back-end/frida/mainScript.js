@@ -11,7 +11,7 @@ var source = fs.readFileSync('./src/back-end/frida/injectedScript.js', 'utf8');
 var functions = {
     eval: {
         intercept: true,
-        replace: true
+        replace: false
     }
 };
 var script;
@@ -24,7 +24,7 @@ async function run(pid) {
     await script.load();
 }
 
-var pid = 12960;
+var pid = 264;
 
 run(pid).catch(onError);
 
@@ -34,8 +34,6 @@ function onClose(msg) {
 function onError(error) {
     console.error(error.stack);
 }
-
-
 
 //TODO: queue for multiple-process intercept (for example tabs in chrome)
 
@@ -51,12 +49,18 @@ function onMessageFromFrida(message, data) {
                 break;
 
             case "ready":
-                process.send(message.payload);
+                if (process.send != null)
+                    process.send(message.payload);
+                else
+                    console.log('Tool is ready!');
                 break;
 
             case "call":
                 // TODO: queue
-                process.send(message.payload);
+                if (process.send != null)
+                    process.send(message.payload);
+                else
+                    console.log("Tool intercept calling " + message.payload.func + " with arguments: " + message.payload.args);
                 break;
 
             default:
