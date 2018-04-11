@@ -5,61 +5,93 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
     <link rel="stylesheet" href="./css/styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
-    <script src="./scripts/script.js"></script>
     <title>JSMonitor</title>
 </head>
 <body>
+
 <nav class="light-blue lighten-1">
-    <div class="nav-wrapper container">
-        <a href="#" class="brand-logo center">JSMonitor</a>
+    <div class="nav-wrapper">
+        <a href="#" class="brand-logo left">JSMonitor</a>
+        <div class="col s8 right">
+            <ul class="tabs ">
+                <li class="tab col s4"><a class="active" href="#test1">Журнал</a></li>
+                <li class="tab col s4"><a href="#test2">Настройки</a></li>
+                <li class="tab col s4"><a href="#test3">О программе</a></li>
+            </ul>
+        </div>
     </div>
 </nav>
-<div id="loader" class="loader-layout">
-    <div class="loader-layout-wrapper">
-        <div class="preloader-wrapper active">
-            <div class="spinner-layer spinner-blue">
-                <div class="circle-clipper left">
-                    <div class="circle"></div>
-                </div><div class="gap-patch">
-                <div class="circle"></div>
-            </div><div class="circle-clipper right">
-                <div class="circle"></div>
-            </div>
-            </div>
 
-            <div class="spinner-layer spinner-red">
-                <div class="circle-clipper left">
-                    <div class="circle"></div>
-                </div><div class="gap-patch">
-                <div class="circle"></div>
-            </div><div class="circle-clipper right">
-                <div class="circle"></div>
-            </div>
-            </div>
-
-            <div class="spinner-layer spinner-yellow">
-                <div class="circle-clipper left">
-                    <div class="circle"></div>
-                </div><div class="gap-patch">
-                <div class="circle"></div>
-            </div><div class="circle-clipper right">
-                <div class="circle"></div>
-            </div>
-            </div>
-
-            <div class="spinner-layer spinner-green">
-                <div class="circle-clipper left">
-                    <div class="circle"></div>
-                </div><div class="gap-patch">
-                <div class="circle"></div>
-            </div><div class="circle-clipper right">
-                <div class="circle"></div>
-            </div>
+<main class="main-wrapper" id="test1">
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content white-text">
+                    <span class="card-title">Card Title</span>
+                    <p>I am a very simple card. I am good at containing small bits of information.
+                        I am convenient because I require little markup to use effectively.</p>
+                </div>
+                <div class="card-action">
+                    <a href="#">This is a link</a>
+                    <a href="#">This is a link</a>
+                </div>
             </div>
         </div>
     </div>
+</main>
 
+
+<div id="test2" class="col s12">Test 2</div>
+<div id="test3" class="col s12">Test 3</div>
+
+<div class="row">
+    <div id="loader" class="loader-layout">
+        <div class="loader-layout-wrapper">
+            <div class="preloader-wrapper active">
+                <div class="spinner-layer spinner-blue">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div><div class="gap-patch">
+                    <div class="circle"></div>
+                </div><div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+                </div>
+
+                <div class="spinner-layer spinner-red">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div><div class="gap-patch">
+                    <div class="circle"></div>
+                </div><div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+                </div>
+
+                <div class="spinner-layer spinner-yellow">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div><div class="gap-patch">
+                    <div class="circle"></div>
+                </div><div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+                </div>
+
+                <div class="spinner-layer spinner-green">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div><div class="gap-patch">
+                    <div class="circle"></div>
+                </div><div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<script src="./scripts/script.js"></script>
 </body>
 </html>
