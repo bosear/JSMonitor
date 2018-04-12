@@ -36,7 +36,7 @@ app.on('ready', () => {
     }));
 
     //frida = require('child_process').fork('./src/back-end/frida/mainScript.js' );
-    const frida = require('child_process').spawn('node', ['./src/back-end/frida/mainScript.js'], {
+    frida = require('child_process').spawn('node', ['./src/back-end/frida/mainScript.js'], {
         stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
     });
     frida.on('message', onMessageFromFrida);
