@@ -27,7 +27,10 @@ const menuTemplate = [{
 }];
 
 app.on('ready', () => {
-    window = new BrowserWindow({});
+    window = new BrowserWindow({
+        width: 1280,
+        height: 725
+    });
 
     window.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
@@ -40,18 +43,20 @@ app.on('ready', () => {
         stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
     });
     frida.on('message', onMessageFromFrida);
-    frida.on('exit', onExitFromFrida);
+    frida.on('close', onExitFromFrida);
+    frida.on('error', onExitFromFrida);
 
     const menuApp = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(menuApp);
-});
 
-//
+    window.on('closed', () => {
+        window = null;
+    });
+});
 
 // TODO: load settings
 // TODO: Send data
 // TODO: Queue
-
 
 function onMessageFromFrida(msg)  {
     switch (msg.type) {
@@ -76,5 +81,6 @@ function onMessageFromFrida(msg)  {
 }
 function onExitFromFrida (msg) {
     console.log('frida is dead...');
+    app.quit();
 }
 

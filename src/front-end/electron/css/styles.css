@@ -13,6 +13,7 @@
     transform: translate(-50%, -50%);
 }
 
+/*----Header----*/
 .tabs {
     background: transparent;
     height: 100%;
@@ -36,10 +37,33 @@ nav .brand-logo.left {
     cursor: default;
 }
 
-.main-wrapper .row {
+/*--------*/
+
+.main-wrapper .modal {
+    top: 15% !important;
+    min-height: 450px;
+    min-width: 650px;
+}
+
+.main-wrapper #loader {
     padding-left: 20px;
     padding-right: 20px;
     padding-top: 20px;
+}
+
+.border-top {
+    border-top: 1px solid rgba(160,160,160,0.2);
+}
+
+.modal-header {
+    padding: 24px;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: 1px solid rgba(160,160,160,0.2);
+}
+
+.modal .modal-content {
+    padding-bottom: 0;
 }
 
 /*-----------------*/
@@ -49,10 +73,10 @@ table, tr {
     max-width: 740px !important;
 }
 
-.table-bordered,.table-bordered td,.table-bordered th {
+.table-bordered, .table-bordered td, .table-bordered th {
     border: none !important;
-    border-right: 1px solid rgba(0,0,0,.06) !important;
-    border-bottom: 1px solid rgba(0,0,0,.06) !important
+    border-right: 1px solid rgba(0, 0, 0, .06) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, .06) !important
 }
 
 td {
@@ -66,9 +90,20 @@ tr > th:first-child {
     overflow: auto !important;
 }
 
+/*-----------------*/
+
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
+}
+
+.modal .modal-footer {
+    text-align: center;
+}
+
+.modal-footer .btn.init {
+    float: none;
+    text-align: center;
 }
 
 ::-webkit-scrollbar-button {
@@ -98,4 +133,11 @@ tr > th:first-child {
 
 ::-webkit-scrollbar-corner {
     background: transparent;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
 }

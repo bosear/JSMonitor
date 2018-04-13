@@ -20,19 +20,22 @@ async function run(pid) {
     var session = await frida.attach(pid);
     script = await session.createScript(source);
     script.events.listen('message', onMessageFromFrida);
+    script.events.listen('destroyed', onClose);
     process.on('message', onMessageFromElectron);
     await script.load();
 }
 
-var pid = 264;
+var pid = 23700;
 
 run(pid).catch(onError);
 
 function onClose(msg) {
-    console.log(msg);
+    console.log('close ' + msg);
+    process.exit();
 }
 function onError(error) {
     console.error(error.stack);
+    process.exit();
 }
 
 //TODO: queue for multiple-process intercept (for example tabs in chrome)
