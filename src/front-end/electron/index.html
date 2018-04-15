@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
     <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="../../../node_modules/prismjs/themes/prism-coy.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
     <title>JSMonitor</title>
 </head>
@@ -11,10 +12,10 @@
 
 <nav class="light-blue lighten-1">
     <div class="nav-wrapper">
-        <a href="#" class="brand-logo left">JSMonitor</a>
+        <span href="#" class="brand-logo left">JSMonitor</span>
         <div class="col s8 right">
             <ul class="tabs ">
-                <li class="tab col s4"><a class="active" href="#test1">Журнал</a></li>
+                <li class="tab col s4"><a class="active" href="#main-wrapper">Журнал</a></li>
                 <li class="tab col s4"><a href="#test2">Настройки</a></li>
                 <li class="tab col s4"><a href="#test3">О программе</a></li>
             </ul>
@@ -22,7 +23,7 @@
     </div>
 </nav>
 
-<main class="main-wrapper" id="test1">
+<main class="main-wrapper" id="main-wrapper">
 
     <a class="waves-effect waves-light btn-large" id="startSession" style="display: none">Начать сессию</a>
 
@@ -71,7 +72,6 @@
             </div>
         </div>
     </div>
-
 
     <div class="row" id="loader" style="display: none">
         <div class="loader-layout">
@@ -129,7 +129,6 @@
         </div>
     </div>
 </main>
-
 
 <div id="test2" class="col s12">Test 2</div>
 <div id="test3" class="col s12">Test 3</div>

@@ -37,6 +37,7 @@ function onClose(msg) {
 }
 function onError(error) {
     console.error(error.stack);
+    process.send({type:'error'});
     process.exit();
 }
 

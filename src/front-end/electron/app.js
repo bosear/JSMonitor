@@ -59,11 +59,10 @@ function onMessageFromWindow(msg) {
         //frida = require('child_process').fork('./src/back-end/frida/mainScript.js' );
 
         frida = require('child_process').spawn('node', ['./src/back-end/frida/mainScript.js'], {
-            stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
+            stdio: ['inherit', 'inherit', 'inherit', 'ipc']
         });
         frida.on('message', onMessageFromFrida);
         frida.on('close', onExitFromFrida);
-        frida.on('error', onExitFromFrida);
     });
 }
 
@@ -71,6 +70,8 @@ function onMessageFromFrida(msg) {
     switch (msg.type) {
         case "call":
             console.log("Tool intercept calling " + msg.func + " with arguments: " + msg.args);
+            window.webContents.send('log', msg);
+
             // stub
             var str = "console.log('Привет, Андрей... Привет, Андрей... Привет, Андрей! Ну где ты был?! Ну обними меня скорей!')";
             frida.send({
@@ -84,12 +85,18 @@ function onMessageFromFrida(msg) {
             window.webContents.send('ready');
             break;
 
+        case "error":
+            console.log("Произошла ошибка");
+            window.webContents.send('error');
+            break;
+
         default:
             console.log(msg);
     }
 }
+
 function onExitFromFrida(msg) {
     console.log('frida is dead...');
-    app.quit();
+    window.webContents.send('dead');
 }
 
