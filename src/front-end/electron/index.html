@@ -23,23 +23,11 @@
 </nav>
 
 <main class="main-wrapper" id="test1">
-    <!--<div class="row">
-        <div class="col s12">
-            <div class="card">
-                <div class="card-content white-text">
-                    <span class="card-title">Card Title</span>
-                    <p>I am a very simple card. I am good at containing small bits of information.
-                        I am convenient because I require little markup to use effectively.</p>
-                </div>
-                <div class="card-action">
-                    <a href="#">This is a link</a>
-                    <a href="#">This is a link</a>
-                </div>
-            </div>
-        </div>
-    </div>-->
+
+    <a class="waves-effect waves-light btn-large" id="startSession" style="display: none">Начать сессию</a>
+
     <div class="modal-wrapper">
-        <div id="startSession" class="modal">
+        <div id="settingsSession" class="modal">
 
             <div class="row modal-header">
                 <h4 class="col">Параметры сессии</h4>
@@ -47,12 +35,10 @@
 
             <div class="modal-content">
 
-
-
                 <div class="row">
 
                     <div class="input-field col s12 m8">
-                        <select class="icons">
+                        <select class="icons" id="selectPlatform">
                             <option value="node" data-icon="./images/icons8-nodejs.png" selected>Node.js</option>
                             <option value="chrome" data-icon="./images/icons8-chrome.png" disabled>Chrome</option>
                         </select>
@@ -65,29 +51,29 @@
                         <span class="helper-text" data-error="Нечисловое значение" data-success="Корректно"></span>
                     </div>
 
-                    <form action="#">
+                    <!--<form action="#">
                         <div class="file-field input-field col s12 m12">
                             <div class="btn">
                                 <span>Файл</span>
-                                <input type="file">
+                                <input type="file" id="pathToApp">
                             </div>
                             <div class="file-path-wrapper">
-                                <input class="file-path validate" type="text"
+                                <input class="file-path validate" type="text" id="fakePathToApp"
                                        placeholder="Введите путь до исследуемого приложения">
                             </div>
                         </div>
-                    </form>
+                    </form>-->
 
                 </div>
             </div>
             <div class="modal-footer border-top">
-                <a href="#!" class="modal-action modal-close waves-effect waves-light btn init">Пуск</a>
+                <a href="#!" class="modal-action modal-close waves-effect waves-light btn init" id="confirmStart">Пуск</a>
             </div>
         </div>
     </div>
 
 
-    <div class="row" id="loader">
+    <div class="row" id="loader" style="display: none">
         <div class="loader-layout">
             <div class="loader-layout-wrapper">
                 <div class="preloader-wrapper active">

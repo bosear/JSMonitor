@@ -1,23 +1,25 @@
-
 const frida = require("frida");
 const fs = require('fs');
 
-var path_chrome = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
-var path_node = "C:\\Program Files\\nodejs\\node.exe";
+const settingPath = './src/storage/settings.json';
+const settings = JSON.parse(fs.readFileSync(settingPath, 'utf-8'));
 
-var path = path_node;
+//var path_chrome = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
+//var path_node = "C:\\Program Files\\nodejs\\node.exe";
 
-var source = fs.readFileSync('./src/back-end/frida/injectedScript.js', 'utf8');
-var functions = {
+let path = settings.path;
+
+let source = fs.readFileSync('./src/back-end/frida/injectedScript.js', 'utf8');
+let functions = { // TODO: change to settings.prop
     eval: {
         intercept: true,
         replace: false
     }
 };
-var script;
+let script;
 
 async function run(pid) {
-    var session = await frida.attach(pid);
+    let session = await frida.attach(pid);
     script = await session.createScript(source);
     script.events.listen('message', onMessageFromFrida);
     script.events.listen('destroyed', onClose);
@@ -25,7 +27,7 @@ async function run(pid) {
     await script.load();
 }
 
-var pid = 23700;
+let pid = +settings.pid;
 
 run(pid).catch(onError);
 

@@ -12,18 +12,19 @@ const menuTemplate = [{
         click() {
             app.quit();
         }
-    }]}, {
-        label: "Dev tools",
-        submenu: [{
-            label: "Open Dev tools",
-            accelerator: "F12",
-            click(item, focusedWindow) {
-                focusedWindow.toggleDevTools();
-            }
-        }, {
-            role: "reload"
+    }]
+}, {
+    label: "Dev tools",
+    submenu: [{
+        label: "Open Dev tools",
+        accelerator: "F12",
+        click(item, focusedWindow) {
+            focusedWindow.toggleDevTools();
         }
-        ]
+    }, {
+        role: "reload"
+    }
+    ]
 }];
 
 app.on('ready', () => {
@@ -38,27 +39,35 @@ app.on('ready', () => {
         slashes: true
     }));
 
-    //frida = require('child_process').fork('./src/back-end/frida/mainScript.js' );
-    frida = require('child_process').spawn('node', ['./src/back-end/frida/mainScript.js'], {
-        stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
-    });
-    frida.on('message', onMessageFromFrida);
-    frida.on('close', onExitFromFrida);
-    frida.on('error', onExitFromFrida);
-
     const menuApp = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(menuApp);
 
     window.on('closed', () => {
         window = null;
     });
+
+    onMessageFromWindow();
 });
 
 // TODO: load settings
 // TODO: Send data
 // TODO: Queue
 
-function onMessageFromFrida(msg)  {
+function onMessageFromWindow(msg) {
+    ipcMain.on('start', () => {
+
+        //frida = require('child_process').fork('./src/back-end/frida/mainScript.js' );
+
+        frida = require('child_process').spawn('node', ['./src/back-end/frida/mainScript.js'], {
+            stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
+        });
+        frida.on('message', onMessageFromFrida);
+        frida.on('close', onExitFromFrida);
+        frida.on('error', onExitFromFrida);
+    });
+}
+
+function onMessageFromFrida(msg) {
     switch (msg.type) {
         case "call":
             console.log("Tool intercept calling " + msg.func + " with arguments: " + msg.args);
@@ -79,7 +88,7 @@ function onMessageFromFrida(msg)  {
             console.log(msg);
     }
 }
-function onExitFromFrida (msg) {
+function onExitFromFrida(msg) {
     console.log('frida is dead...');
     app.quit();
 }
