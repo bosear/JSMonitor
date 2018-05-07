@@ -10,12 +10,7 @@ const settings = JSON.parse(fs.readFileSync(settingPath, 'utf-8'));
 let path = settings.path;
 
 let source = fs.readFileSync('./src/back-end/frida/injectedScript.js', 'utf8');
-let functions = { // TODO: change to settings.prop
-    eval: {
-        intercept: true,
-        replace: false
-    }
-};
+let functions = JSON.parse(fs.readFileSync('./src/storage/settings.json', 'utf8')).functions; // TODO: change to settings.prop
 let script;
 
 async function run(pid) {
@@ -37,7 +32,7 @@ function onClose(msg) {
 }
 function onError(error) {
     console.error(error.stack);
-    process.send({type:'error'});
+    process.send({type: 'error'});
     process.exit();
 }
 

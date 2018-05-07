@@ -307,3 +307,45 @@ function writeString1() {
  }
  }
  });*/
+
+// need esprima.js
+
+function traverse(node, func) {
+    func(node);//1
+    for (var key in node) { //2
+        if (node.hasOwnProperty(key)) { //3
+            var child = node[key];
+            if (typeof child === 'object' && child !== null) { //4
+
+                if (Array.isArray(child)) {
+                    child.forEach(function(node) { //5
+                        traverse(node, func);
+                    });
+                } else {
+                    traverse(child, func); //6
+                }
+            }
+        }
+    }
+}
+
+function analyzeCode(code) {
+    var ast = esprima.parse(code);
+    var calls = [];
+
+    traverse(ast, function(node) { //3
+        if (node.type === 'CallExpression') {
+            if (node.callee.type === 'Identifier') {
+                calls.push({
+                    func: node.callee.name
+                });
+            } else if (node.callee.type === 'MemberExpression'){
+                calls.push({
+                    func: node.callee.property.name
+                });
+            }
+        }
+    });
+
+    return calls;
+}

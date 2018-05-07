@@ -38,7 +38,29 @@ nav .brand-logo.left {
     cursor: default;
 }
 
+.modal-wrapper textarea {
+    font-family: monospace;
+    min-height: 200px;
+    resize: none;
+    border: none;
+    border-bottom: 2px solid darkgreen;
+}
+
+.modal-wrapper textarea:focus {
+    border: none;
+    outline-color: #29b6f6;
+}
 /*--------*/
+
+.navigation {
+    position: fixed;
+    top: 0;
+    z-index: 100;
+}
+
+.main-wrapper {
+    margin-top: 90px;
+}
 
 .main-wrapper .modal {
     top: 15% !important;
@@ -54,14 +76,14 @@ nav .brand-logo.left {
 }
 
 .border-top {
-    border-top: 1px solid rgba(160,160,160,0.2);
+    border-top: 1px solid rgba(160, 160, 160, 0.2);
 }
 
 .modal-header {
     padding: 24px;
     padding-bottom: 0;
     margin-bottom: 0;
-    border-bottom: 1px solid rgba(160,160,160,0.2);
+    border-bottom: 1px solid rgba(160, 160, 160, 0.2);
 }
 
 .modal .modal-content {
@@ -76,15 +98,46 @@ nav .brand-logo.left {
 }
 
 .card.log {
-    width: 1200px;
+    width: 800px;
     margin: 30px auto;
+}
+
+.settings-wrapper {
+    width: 800px;
+    margin: 30px auto;
+}
+
+.settings-wrapper > h2 {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.card.settings {
+    padding: 1px;
+}
+
+.card.settings ul ul {
+    margin-left: 40px;
+}
+
+.switch label {
+    font-size: 1.2rem;
+}
+
+.func-name {
+    vertical-align: -webkit-baseline-middle;
+}
+
+.save-ast {
+    float: right;
+    margin-right: 20px;
 }
 
 /*-----------------*/
 
 table, tr {
-    width: 600px !important;
-    max-width: 600px !important;
+    width: 800px !important;
+    max-width: 800px !important;
 }
 
 .table-bordered, .table-bordered td, .table-bordered th {
@@ -94,14 +147,15 @@ table, tr {
 }
 
 td {
-    width: 695px !important;
-    max-width: 695px !important;
+    width: 760px !important;
+    max-width: 760px !important;
     overflow: auto !important;
 }
 
 tr > th:first-child {
     max-width: 40px !important;
     overflow: auto !important;
+    text-align: center;
 }
 
 /*-----------------*/

@@ -3,7 +3,7 @@ const {app, BrowserWindow, Menu, ipcMain} = electron;
 const url = require('url');
 const path = require('path');
 
-let frida, window;
+let frida, window, savedStr; // TODO: to change for
 const menuTemplate = [{
     label: 'File',
     submenu: [{
@@ -22,7 +22,13 @@ const menuTemplate = [{
             focusedWindow.toggleDevTools();
         }
     }, {
-        role: "reload"
+        label: "Reload",
+        accelerator: "Ctrl + R",
+        click(item, focusedWindow) {
+            frida.kill();
+            frida = null;
+            focusedWindow.reload();
+        }
     }
     ]
 }];
@@ -64,6 +70,17 @@ function onMessageFromWindow(msg) {
         frida.on('message', onMessageFromFrida);
         frida.on('close', onExitFromFrida);
     });
+
+    ipcMain.on('inputMsg', (event, msg) => {
+        if (savedStr === msg.str)
+            msg.skip = true;
+
+        frida.send({
+            type: "call",
+            args: [msg.str], // TODO: to change for args
+            skip: msg.skip
+        });
+    });
 }
 
 function onMessageFromFrida(msg) {
@@ -71,13 +88,14 @@ function onMessageFromFrida(msg) {
         case "call":
             console.log("Tool intercept calling " + msg.func + " with arguments: " + msg.args);
             window.webContents.send('log', msg);
+            savedStr = msg.args; // TODO: to change for args
 
             // stub
-            var str = "console.log('Привет, Андрей... Привет, Андрей... Привет, Андрей! Ну где ты был?! Ну обними меня скорей!')";
+            /*var str = "console.log('Привет, Андрей... Привет, Андрей... Привет, Андрей! Ну где ты был?! Ну обними меня скорей!')";
             frida.send({
                 type: "call",
-                args: [str]
-            });
+                args: [str] // TODO: to change for args
+            });*/
             break;
 
         case "ready":

@@ -19,19 +19,20 @@ var functions, functionsMap = {
 function attach() {
     var callbacks = {};
 
-    for (var func in functions) {
+    functions.forEach(function(funcObj) {
+        functionsMap[funcObj.func].settings = funcObj;
 
-        if (!functions[func].intercept)
-            continue;
+        if (!funcObj.intercept)
+            return;
 
-        if (functionsMap[func].onEnter)
-            callbacks.onEnter = functionsMap[func].onEnter;
+        if (functionsMap[funcObj.func].onEnter)
+            callbacks.onEnter = functionsMap[funcObj.func].onEnter;
 
-        if (functionsMap[func].onLeave)
-            callbacks.onLeave = functionsMap[func].onLeave;
+        if (functionsMap[funcObj.func].onLeave)
+            callbacks.onLeave = functionsMap[funcObj.func].onLeave;
 
-        Interceptor.attach(functionsMap[func].target, callbacks);
-    }
+        Interceptor.attach(functionsMap[funcObj.func].target, callbacks);
+    });
 }
 
 function init() {
@@ -58,9 +59,11 @@ function onEnterToEval(args) {
         args: [stringObj.string]
     });
 
-    if (functions['eval'].replace) {
+    if (!functionsMap['eval'].settings.replace) {
         var promise = recv("call", function (resp) {
-            str = resp.args[0];
+            if (resp.skip)
+                return;
+            str = ''+resp.args[0];
         });
         promise.wait();
 
