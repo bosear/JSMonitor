@@ -4,14 +4,12 @@ const fs = require('fs');
 const settingPath = './src/storage/settings.json';
 const settings = JSON.parse(fs.readFileSync(settingPath, 'utf-8'));
 
-//var path_chrome = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
-//var path_node = "C:\\Program Files\\nodejs\\node.exe";
-
-let path = settings.path;
-
 let source = fs.readFileSync('./src/back-end/frida/injectedScript.js', 'utf8');
-let functions = JSON.parse(fs.readFileSync('./src/storage/settings.json', 'utf8')).functions; // TODO: change to settings.prop
-let script;
+let functions = settings.functions; // TODO: change to settings.prop
+let platform = settings.platform;
+let script, fileNameLog;
+
+setLog('mainScript.js');
 
 async function run(pid) {
     let session = await frida.attach(pid);
@@ -27,7 +25,7 @@ let pid = +settings.pid;
 run(pid).catch(onError);
 
 function onClose(msg) {
-    console.log('close ' + msg);
+    log('close ' + msg);
     process.exit();
 }
 function onError(error) {
@@ -45,7 +43,8 @@ function onMessageFromFrida(message, data) {
             case "settings":
                 script.post({
                     type: "settings",
-                    payload: functions
+                    payload: functions,
+                    platform: platform,
                 });
                 break;
 
@@ -53,7 +52,7 @@ function onMessageFromFrida(message, data) {
                 if (process.send != null)
                     process.send(message.payload);
                 else
-                    console.log('Tool is ready!');
+                    log('Tool is ready!');
                 break;
 
             case "call":
@@ -61,11 +60,11 @@ function onMessageFromFrida(message, data) {
                 if (process.send != null)
                     process.send(message.payload);
                 else
-                    console.log("Tool intercept calling " + message.payload.func + " with arguments: " + message.payload.args);
+                    log("Tool intercept calling " + message.payload.func + " with arguments: " + message.payload.args);
                 break;
 
             default:
-                console.log(message.payload);
+                log(message.payload);
         }
     } else if (message.type === 'error') {
         console.error(message.stack);
@@ -75,10 +74,19 @@ function onMessageFromFrida(message, data) {
 function onMessageFromElectron(msg) {
     switch (msg.type) {
         case "call":
+            log("Отправляю данные на внутреннюю фриду " + msg.args[0]);
             script.post(msg);
             break;
 
         default:
-            console.log(msg);
+            log(msg);
     }
+}
+
+function log(msg) {
+    console.log(fileNameLog ? '[ ' + fileNameLog + ' ] ' + ': ' + msg : '' + msg);
+}
+
+function setLog(fileName) {
+    fileNameLog = fileName;
 }

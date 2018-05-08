@@ -2,8 +2,10 @@ const electron = require('electron');
 const {app, BrowserWindow, Menu, ipcMain} = electron;
 const url = require('url');
 const path = require('path');
+const fs = require('fs');
 
-let frida, window, savedStr; // TODO: to change for
+let frida, window, savedStr, fileNameLog;
+const pathToLog = 'log.txt';
 const menuTemplate = [{
     label: 'File',
     submenu: [{
@@ -21,22 +23,15 @@ const menuTemplate = [{
         click(item, focusedWindow) {
             focusedWindow.toggleDevTools();
         }
-    }, {
-        label: "Reload",
-        accelerator: "Ctrl + R",
-        click(item, focusedWindow) {
-            frida.kill();
-            frida = null;
-            focusedWindow.reload();
-        }
-    }
-    ]
+    }]
 }];
+setLog('app.js');
 
 app.on('ready', () => {
     window = new BrowserWindow({
         width: 1280,
-        height: 725
+        height: 725,
+        icon: path.join(__dirname, "./images/favicon.png")
     });
 
     window.loadURL(url.format({
@@ -55,29 +50,27 @@ app.on('ready', () => {
     onMessageFromWindow();
 });
 
-// TODO: load settings
-// TODO: Send data
 // TODO: Queue
 
 function onMessageFromWindow(msg) {
     ipcMain.on('start', () => {
-
-        //frida = require('child_process').fork('./src/back-end/frida/mainScript.js' );
-
         frida = require('child_process').spawn('node', ['./src/back-end/frida/mainScript.js'], {
             stdio: ['inherit', 'inherit', 'inherit', 'ipc']
         });
+
         frida.on('message', onMessageFromFrida);
         frida.on('close', onExitFromFrida);
     });
 
     ipcMain.on('inputMsg', (event, msg) => {
+        log('app.js я вызываюсь inputMsg, msg.str: ' + msg.str + ' savedStr: ' + savedStr);
+
         if (savedStr === msg.str)
             msg.skip = true;
 
         frida.send({
             type: "call",
-            args: [msg.str], // TODO: to change for args
+            args: [msg.str],
             skip: msg.skip
         });
     });
@@ -86,35 +79,42 @@ function onMessageFromWindow(msg) {
 function onMessageFromFrida(msg) {
     switch (msg.type) {
         case "call":
-            console.log("Tool intercept calling " + msg.func + " with arguments: " + msg.args);
+            log("Tool intercept calling " + msg.func + " with arguments: " + msg.args);
+            logToFile(msg);
             window.webContents.send('log', msg);
-            savedStr = msg.args; // TODO: to change for args
-
-            // stub
-            /*var str = "console.log('Привет, Андрей... Привет, Андрей... Привет, Андрей! Ну где ты был?! Ну обними меня скорей!')";
-            frida.send({
-                type: "call",
-                args: [str] // TODO: to change for args
-            });*/
+            savedStr = msg.args;
             break;
 
         case "ready":
-            console.log("Tool loaded!");
+            log("Tool loaded!");
             window.webContents.send('ready');
             break;
 
         case "error":
-            console.log("Произошла ошибка");
+            log("Произошла ошибка");
             window.webContents.send('error');
             break;
 
         default:
-            console.log(msg);
+            log(msg);
     }
 }
 
 function onExitFromFrida(msg) {
-    console.log('frida is dead...');
+    log('frida is dead...');
     window.webContents.send('dead');
 }
 
+
+function logToFile(msg) {
+    let logStr = '[ ' + (new Date()).toString() + ' ]' + '  function: ' + msg.func + ', argument: ' + msg.args + '\n';
+    fs.appendFileSync(pathToLog, logStr);
+}
+
+function log(msg) {
+    console.log(fileNameLog ? '[ ' + fileNameLog + ' ] ' + ': ' + msg : '' + msg);
+}
+
+function setLog(fileName) {
+    fileNameLog = fileName;
+}

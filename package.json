@@ -1,12 +1,14 @@
 {
-  "name": "frida-hello-world",
+  "name": "JSMonitor",
   "version": "2.0.0",
   "description": "",
   "main": "src/front-end/electron/app.js",
   "dependencies": {
+    "codemirror": "^5.37.0",
     "electron": "^1.8.4",
     "esprima": "^4.0.0",
     "frida": "^10.7.6",
+    "javascript-editor": "^1.0.3",
     "js-beautify": "^1.7.5",
     "prismjs": "^1.14.0"
   },
@@ -15,6 +17,6 @@
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Artem Boldyrev",
   "license": "ISC"
 }

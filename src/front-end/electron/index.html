@@ -40,8 +40,8 @@
 
                     <div class="input-field col s12 m8">
                         <select class="icons" id="selectPlatform">
-                            <option value="node" data-icon="./images/icons8-nodejs.png" selected>Node.js</option>
-                            <option value="chrome" data-icon="./images/icons8-chrome.png" disabled>Chrome</option>
+                            <option value="node.exe" data-icon="./images/icons8-nodejs.png" selected>Node.js</option>
+                            <option value="v8.dll" data-icon="./images/icons8-chrome.png">Chrome</option>
                         </select>
                         <label>Выберите платформу</label>
                     </div>
@@ -52,18 +52,6 @@
                         <span class="helper-text" data-error="Нечисловое значение" data-success="Корректно"></span>
                     </div>
 
-                    <!--<form action="#">
-                        <div class="file-field input-field col s12 m12">
-                            <div class="btn">
-                                <span>Файл</span>
-                                <input type="file" id="pathToApp">
-                            </div>
-                            <div class="file-path-wrapper">
-                                <input class="file-path validate" type="text" id="fakePathToApp"
-                                       placeholder="Введите путь до исследуемого приложения">
-                            </div>
-                        </div>
-                    </form>-->
 
                 </div>
             </div>
@@ -141,7 +129,7 @@
                         <label>
                             <input type="checkbox" id="switchEval">
                             <span class="lever"></span>
-                            eval
+                            Детектировать eval
                         </label>
                     </div>
                     <ul>
@@ -150,7 +138,7 @@
                                 <p>
                                     <label>
                                         <input type="checkbox" id="checkboxEval"/>
-                                        <span>Тихий режим</span>
+                                        <span>Использовать "тихий режим"</span>
                                     </label>
                                 </p>
                             </form>
@@ -164,7 +152,18 @@
         </div>
     </div>
 </main>
-<div id="about" class="col s12">Test 3</div>
+
+<main id="about" class="main-wrapper">
+    <div class="about-wrapper">
+        <div class="card">
+            <p> JSMonitor, версия 2.0 <br> <br>
+
+                Самарский университет. Все права защищены ©
+            </p>
+
+        </div>
+    </div>
+</main>
 
 <div class="modal-wrapper">
     <div id="showCall" class="modal" style="display: none">
@@ -177,7 +176,6 @@
             <div class="row">
                 <div class="input-field col s12">
                     <textarea id="funcArg"></textarea>
-                   <!--TODO: заменить на несколько аргументов-->
                 </div>
             </div>
         </div>

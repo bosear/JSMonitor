@@ -102,9 +102,14 @@ nav .brand-logo.left {
     margin: 30px auto;
 }
 
-.settings-wrapper {
+.settings-wrapper, .about-wrapper {
     width: 800px;
     margin: 30px auto;
+}
+
+.about-wrapper .card {
+    min-height: 100px;
+    padding: 20px;
 }
 
 .settings-wrapper > h2 {

@@ -4,17 +4,25 @@
 var getFunctionFromEval = '?GetFunctionFromEval@Compiler@internal@v8@@SA?AV?$MaybeHandle@VJSFunction@internal@v8@@@23@V?$Handle@VString@internal@v8@@@23@V?$Handle@VSharedFunctionInfo@internal@v8@@@23@V?$Handle@VContext@internal@v8@@@23@W4LanguageMode@23@W4ParseRestriction@23@HHHHHV?$Handle@VObject@internal@v8@@@23@VScriptOriginOptions@3@@Z';
 var getCurrentIsolate = '?GetCurrent@Isolate@v8@@SAPEAV12@XZ';
 var newStringFromUtf8 = '?NewStringFromUtf8@Factory@internal@v8@@QEAA?AV?$MaybeHandle@VString@internal@v8@@@23@V?$Vector@$$CBD@23@W4PretenureFlag@23@@Z';
+var func_getFunctionFromEval, func_getCurrentIsolate, func_newStringFromUtf8, fileNameLog;
 
-var func_getFunctionFromEval = new NativeFunction(Module.findExportByName('node.exe', getFunctionFromEval), 'pointer', ['pointer', 'pointer', 'pointer', 'pointer', 'pointer', 'int', 'int', 'int', 'int', 'int', 'pointer', 'pointer']);
-var func_getCurrentIsolate = new NativeFunction(Module.findExportByName('node.exe', getCurrentIsolate), 'pointer', []);
-var func_newStringFromUtf8 = new NativeFunction(Module.findExportByName('node.exe', newStringFromUtf8), 'pointer', ['pointer', 'pointer', 'pointer', 'int']);
+setLog('injectedScript.js');
 
-var functions, functionsMap = {
-    eval: {
-        target: func_getFunctionFromEval,
-        onEnter: onEnterToEval
-    }
+function captureFunctions(platform) {
+    log('platform ' + platform);
+    func_getFunctionFromEval = new NativeFunction(Module.findExportByName(platform, getFunctionFromEval), 'pointer', ['pointer', 'pointer', 'pointer', 'pointer', 'pointer', 'int', 'int', 'int', 'int', 'int', 'pointer', 'pointer']);
+    func_getCurrentIsolate = new NativeFunction(Module.findExportByName(platform, getCurrentIsolate), 'pointer', []);
+    func_newStringFromUtf8 = new NativeFunction(Module.findExportByName(platform, newStringFromUtf8), 'pointer', ['pointer', 'pointer', 'pointer', 'int']);
+
+    functionsMap = {
+        eval: {
+            target: func_getFunctionFromEval,
+            onEnter: onEnterToEval
+        }
+    };
 };
+
+var functions, platform, functionsMap;
 
 function attach() {
     var callbacks = {};
@@ -39,6 +47,7 @@ function init() {
     send({type: "settings"});
     var promise = recv("settings", function (resp) {
         functions = resp.payload;
+        captureFunctions(resp.platform);
     });
     promise.wait();
     attach();
@@ -47,10 +56,18 @@ function init() {
 
 // tool from eval
 function onEnterToEval(args) {
-    var str = '';
+    var str = '', skip = false;
     var stringPointer = Memory.readPointer(args[1]);
 
-    //console.log(Memory.readUtf16String(Memory.readPointer(Memory.readPointer(stringPointer.add(23)).add(23)).add(23)));
+    log('detect calling eval');
+
+    log('pointer' + Memory.readPointer(stringPointer.add(31)));
+    /*log(hexdump(Memory.readPointer(stringPointer.add(31)), {
+        offset: 0,
+        length: 512
+    }));*/
+    
+    //log(Memory.readUtf16String(Memory.readPointer(Memory.readPointer(stringPointer.add(23)).add(23)).add(23)));
 
     var stringObj = getStringObject(stringPointer);
     send({
@@ -60,21 +77,23 @@ function onEnterToEval(args) {
     });
 
     if (!functionsMap['eval'].settings.replace) {
+        log('Получен объект V8::i::String');
+        
         var promise = recv("call", function (resp) {
+            log('Получены новые данные с UI skip: ' + resp.skip + ' resp.args[0]: ' + resp.args[0]);
             if (resp.skip)
-                return;
+                skip = true;
             str = ''+resp.args[0];
         });
         promise.wait();
+
+        if (skip)
+            return;
 
         var writableString = Memory.allocUtf8String(str);
         var vector = Memory.alloc(16);
         Memory.writePointer(vector, writableString);
         Memory.writeUInt(vector.add(8), lengthInUtf8Bytes(str));
-
-        //console.log('vector: ' + vector);
-        //console.log('writable string: ' + writableString);
-        //console.log('stringPointer: ' + stringPointer);
 
         var isolate = func_getCurrentIsolate();
         var rdx = Memory.alloc(8);
@@ -83,8 +102,8 @@ function onEnterToEval(args) {
         args[1] = Memory.readPointer(rdx);
     }
 
-    //console.log('string: ' + stringObj.string);
-    //console.log('size: ' + stringObj.size);
+    //log('string: ' + stringObj.string);
+    //log('size: ' + stringObj.size);
 
     function getStringObject(stringPointer) {
         var string = stringPointer.add(23);
@@ -143,5 +162,10 @@ function onEnterToEval(args) {
 
 init();
 
-//console.log('--------------------');
-//console.log('Attached?');
+function log(msg) {
+    console.log(fileNameLog ? '[ ' + fileNameLog + ' ] ' + ': ' + msg : '' + msg);
+}
+
+function setLog(fileName) {
+    fileNameLog = fileName;
+}

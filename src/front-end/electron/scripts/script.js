@@ -13,6 +13,9 @@ const pathToSettings = "./src/storage/settings.json";
 let settingsFile = fs.readFileSync(pathToSettings, 'utf-8');
 const settings = JSON.parse(settingsFile);
 let number = 0, messages = [];
+var isClosedReplaceWindow = false, fileNameLog;
+
+initLog('script.js');
 
 init();
 
@@ -43,16 +46,13 @@ function init() {
     M.Tabs.init(el);
 
     let selectPlatform = document.getElementById('selectPlatform');
-    if (settings.platform == 'node') {
+    if (settings.platform == 'node.exe') {
         selectPlatform.getElementsByTagName('option')[0].selected = 'selected';
-    } else if (settings.platform == 'chrome') {
+    } else if (settings.platform == 'v8.dll') {
         selectPlatform.getElementsByTagName('option')[1].selected = 'selected';
     } else {
         selectPlatform.getElementsByTagName('option')[0].selected = 'selected';
     }
-
-    //let pathToApp = document.getElementById('fakePathToApp');
-    //pathToApp.value = path.basename(settings.path);
 
     let pid = document.getElementById('last_name');
     pid.value = settings.pid;
@@ -67,18 +67,7 @@ function init() {
             start.classList.add('disabled');
         }
     });
-
-
-    /*document.getElementById('pathToApp').addEventListener('change', () => {
-     setTimeout(() => {
-     if (checkSettings())
-     start.classList.remove('disabled');
-     else if (pathToApp.value == "" && !start.classList.contains('disabled')) {
-     start.classList.add('disabled');
-     }
-     }, 0);
-     });*/
-
+    
     startButton.addEventListener('click', () => {
         startSession();
     });
@@ -122,13 +111,11 @@ function startSession() {
     function submitInitSettings() {
         if (checkSettings()) {
             startButton.style.display = 'none';
-
-            //let pathToApp = document.getElementById('pathToApp');
+            
             let pid = document.getElementById('last_name');
             let platform = document.getElementById('selectPlatform');
 
             const newSettings = {
-                //path: pathToApp.files.length ? pathToApp.files[0].path : settings.path,
                 pid: pid.value,
                 platform: platform.value,
                 functions: settings.functions
@@ -235,7 +222,7 @@ function logCall(msg) {
                 extensions: ['json']
             }]
         }, (filePath) => {
-            fs.writeFileSync(filePath, JSON.stringify(esprima.parseScript(msg.args[0]))); // TODO: to change for multiple arguments
+            fs.writeFileSync(filePath, JSON.stringify(esprima.parseScript(msg.args[0])));
         });
     }
 }
@@ -244,7 +231,7 @@ function initGlobalSettings() {
     let evalObj, switchEval, checkboxEval, newFunctions;
 
     // eval
-    evalObj = settings.functions[0]; //TODO change structure
+    evalObj = settings.functions[0];
     switchEval = document.getElementById('switchEval');
     switchEval.checked = evalObj.intercept;
     checkboxEval = document.getElementById('checkboxEval');
@@ -266,7 +253,6 @@ function initGlobalSettings() {
             functions: newFunctions
         };
         fs.writeFile(pathToSettings, JSON.stringify(newSettings), (error)=> {
-
             if (error)
                 M.toast({html: 'Произошла ошибка'});
             else
@@ -281,10 +267,11 @@ function initGlobalSettings() {
 
 function showCall(msg) {
     let title = document.getElementById('funcName');
-    title.innerText = msg.func;
+    title.innerText = 'Вызов ' +  msg.func;
     let text = document.getElementById('funcArg');
     //text.innerHTML = '';
     text.value = beautify(msg.args[0], {indent_size: 2});
+    isClosedReplaceWindow = false;
 
     let elem = document.getElementById('showCall');
     let instance = M.Modal.init(elem, {
@@ -298,6 +285,10 @@ function showCall(msg) {
     document.getElementById('skipArg').addEventListener('click', cancel);
 
     function cancel() {
+        if (isClosedReplaceWindow)
+            return;
+
+        isClosedReplaceWindow = true;
         ipcRenderer.send('inputMsg',{
             str: text.innerHTML,
             skip: true
@@ -305,9 +296,22 @@ function showCall(msg) {
     }
 
     function confirm() {
+        if (isClosedReplaceWindow)
+            return;
+        
+        isClosedReplaceWindow = true;
         ipcRenderer.send('inputMsg',{
             str: text.value,
             skip: false
         });
     }
 }
+
+function log(msg) {
+    console.log(fileNameLog ? '[ ' + fileNameLog + ' ] ' + ': ' + msg : '' + msg);
+}
+
+function initLog(fileName) {
+    fileNameLog = fileName;
+}
+
