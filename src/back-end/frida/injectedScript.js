@@ -8,7 +8,7 @@ var func_getFunctionFromEval, func_getCurrentIsolate, func_newStringFromUtf8, fi
 
 setLog('injectedScript.js');
 
-function captureFunctions(platform) {
+function setWrapperFunctions(platform) {
     log('platform ' + platform);
     func_getFunctionFromEval = new NativeFunction(Module.findExportByName(platform, getFunctionFromEval), 'pointer', ['pointer', 'pointer', 'pointer', 'pointer', 'pointer', 'int', 'int', 'int', 'int', 'int', 'pointer', 'pointer']);
     func_getCurrentIsolate = new NativeFunction(Module.findExportByName(platform, getCurrentIsolate), 'pointer', []);
@@ -47,7 +47,7 @@ function init() {
     send({type: "settings"});
     var promise = recv("settings", function (resp) {
         functions = resp.payload;
-        captureFunctions(resp.platform);
+        setWrapperFunctions(resp.platform);
     });
     promise.wait();
     attach();
@@ -61,12 +61,17 @@ function onEnterToEval(args) {
 
     log('detect calling eval');
 
-    log('pointer' + Memory.readPointer(stringPointer.add(31)));
-    /*log(hexdump(Memory.readPointer(stringPointer.add(31)), {
+    console.log(hexdump(stringPointer, {
         offset: 0,
         length: 512
-    }));*/
-    
+    }));
+
+    log('pointer' + Memory.readPointer(stringPointer.add(31)));
+    /*log(hexdump(Memory.readPointer(stringPointer.add(31)), {
+     offset: 0,
+     length: 512
+     }));*/
+
     //log(Memory.readUtf16String(Memory.readPointer(Memory.readPointer(stringPointer.add(23)).add(23)).add(23)));
 
     var stringObj = getStringObject(stringPointer);
@@ -78,7 +83,7 @@ function onEnterToEval(args) {
 
     if (!functionsMap['eval'].settings.replace) {
         log('Получен объект V8::i::String');
-        
+
         var promise = recv("call", function (resp) {
             log('Получены новые данные с UI skip: ' + resp.skip + ' resp.args[0]: ' + resp.args[0]);
             if (resp.skip)
@@ -96,14 +101,11 @@ function onEnterToEval(args) {
         Memory.writeUInt(vector.add(8), lengthInUtf8Bytes(str));
 
         var isolate = func_getCurrentIsolate();
-        var rdx = Memory.alloc(8);
-        func_newStringFromUtf8(isolate, rdx, vector, 0);
+        var memoryForNewObject = Memory.alloc(8);
+        func_newStringFromUtf8(isolate, memoryForNewObject, vector, 0);
 
-        args[1] = Memory.readPointer(rdx);
+        args[1] = Memory.readPointer(memoryForNewObject);
     }
-
-    //log('string: ' + stringObj.string);
-    //log('size: ' + stringObj.size);
 
     function getStringObject(stringPointer) {
         var string = stringPointer.add(23);
@@ -143,7 +145,6 @@ function onEnterToEval(args) {
     }
 
     function isArrayEqual(arr1, arr2) {
-
         for (var i = 0; i < arr1.length; i++)
             if (arr1[i] !== arr2[i])
                 return false;
