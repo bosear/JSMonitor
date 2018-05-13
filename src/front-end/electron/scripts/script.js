@@ -36,7 +36,7 @@ ipcRenderer.on('error', (event) => {
 
 ipcRenderer.on('log', (event, msg) => {
     logCall(msg);
-    if (!settings.functions[0].replace) // TODO: for others functions
+    if (!settings.functions[msg.func].replace)
         showCall(msg);
 });
 
@@ -227,7 +227,7 @@ function logCall(msg) {
     }
 }
 
-function initGlobalSettings() {
+function initGlobalSettings() { // TODO: change for multiple functions
     let evalObj, switchEval, checkboxEval, newFunctions;
 
     // eval

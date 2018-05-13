@@ -1,1 +1,16 @@
-{"pid":"15572","platform":"v8.dll","functions":[{"func":"eval","intercept":true,"replace":false}]}
+{
+  "pid": "12952",
+  "platform": "node.exe",
+  "functions": {
+    "eval": {
+      "func": "eval",
+      "intercept": true,
+      "replace": false
+    },
+    "new Function": {
+      "func": "new Function",
+      "intercept": true,
+      "replace": false
+    }
+  }
+}

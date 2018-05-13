@@ -5,7 +5,7 @@ const settingPath = './src/storage/settings.json';
 const settings = JSON.parse(fs.readFileSync(settingPath, 'utf-8'));
 
 let source = fs.readFileSync('./src/back-end/frida/injectedScript.js', 'utf8');
-let functions = settings.functions; // TODO: change to settings.prop
+let functions = settings.functions;
 let platform = settings.platform;
 let script, fileNameLog;
 
