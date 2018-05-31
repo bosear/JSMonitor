@@ -36,7 +36,7 @@ function setWrapperFunctions(platform) {
             target: func_getFunctionFromEval,
             onEnter: onEnterToEval
         },
-        newFunction: {
+        Function: {
             target: func_getFunctionFromEval,
             onEnter: onEnterToNewFunction
         }
@@ -52,7 +52,7 @@ function attach() {
         console.log(functionsMap[func].settings);
         console.log(func + '');
 
-        functionsMap[func].settings = funcObj;
+        functionsMap[func].settings = functions[func];
 
         if (!functions[func].intercept)
             return;
@@ -81,13 +81,13 @@ function init() {
 function getStringFromV8(stringPointer) {
     var string, size, type = '0x' + getStringType(stringPointer);
 
-    if (isSliced(type)) {
+    /*if (isSliced(type)) {
         console.log('lol');
         console.log(hexdump(Memory.readPointer(stringPointer.sub(1)), {
             offset: 0,
             length: 512
         }));
-    }
+    }*/
 
     if (isSequential(type)) {
         string = stringPointer.add(23);
@@ -101,6 +101,32 @@ function getStringFromV8(stringPointer) {
         return getStringFromV8(Memory.readPointer(stringPointer.add(23))) +
             getStringFromV8(Memory.readPointer(stringPointer.add(31)));
     }
+}
+
+function getStringFromV8Iterate(stringPointer) {
+    var queue = [stringPointer];
+    var string = '', stringOffset, currentPointer, size, type;
+
+    while(queue.length) {
+        currentPointer = queue.pop();
+        type = '0x' + getStringType(currentPointer);
+
+        if (isSequential(type)) {
+            stringOffset = currentPointer.add(23);
+            size = Memory.readInt(currentPointer.add(19));
+
+            if (isSequentialOneByte(type))
+                string += Memory.readUtf8String(stringOffset, size);
+            else
+                string += Memory.readUtf16String(stringOffset, size);
+
+        } else if (isCons(type)) {
+            queue.push(Memory.readPointer(currentPointer.add(31)));
+            queue.push(Memory.readPointer(currentPointer.add(23)));
+        }
+    }
+
+    return string;
 }
 
 function fullRepresentationTag(type) {
@@ -192,12 +218,12 @@ function onEnterToEval(args, isNewFunction) {
 
     //log(Memory.readUtf16String(Memory.readPointer(Memory.readPointer(stringPointer.add(23)).add(23)).add(23)));
 
-    var stringObj = getStringFromV8(stringPointer);
+    var stringObj = getStringFromV8Iterate(stringPointer);
     console.log("string: " + stringObj);
 
     send({
         type: "call",
-        func: isNewFunction ? "new Function" : "eval",
+        func: isNewFunction ? "Function" : "eval",
         args: [stringObj]
     });
 

@@ -54,7 +54,8 @@ app.on('ready', () => {
 
 function onMessageFromWindow(msg) {
     ipcMain.on('start', () => {
-        frida = require('child_process').spawn('node', ['./src/back-end/frida/mainScript.js'], {
+        frida = require('child_process').
+        spawn('node', ['./src/back-end/frida/mainScript.js'], {
             stdio: ['inherit', 'inherit', 'inherit', 'ipc']
         });
 

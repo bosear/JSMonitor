@@ -192,7 +192,7 @@ function logCall(msg) {
     secondCol = document.createElement('th');
     funcName = document.createElement('span');
     funcName.classList.add('func-name');
-    funcName.innerText = msg.func;
+    funcName.innerText = settings.functions[msg.func].func;
     secondCol.appendChild(funcName);
 
     saveButton = document.createElement('a');
@@ -228,30 +228,51 @@ function logCall(msg) {
 }
 
 function initGlobalSettings() { // TODO: change for multiple functions
-    let evalObj, switchEval, checkboxEval, newFunctions;
+    let evalObj, switchEval, checkboxEval, newFunctions, newFunctionBody, functionName;
+    var settingsBody = document.querySelector('.card.settings > ul');
 
-    // eval
-    evalObj = settings.functions[0];
-    switchEval = document.getElementById('switchEval');
-    switchEval.checked = evalObj.intercept;
-    checkboxEval = document.getElementById('checkboxEval');
-    checkboxEval.disabled = !evalObj.intercept;
-    checkboxEval.checked = evalObj.replace;
+    for (let func in settings.functions) {
+        var funcItem = document.createElement('li');
+        funcItem.dataset.func = func;
+        funcItem.dataset.fullFunc = settings.functions[func].func;
+        var html = `<div class="switch"><label><input type="checkbox" id="switch-`+func+`" `+(settings.functions[func].intercept?`checked`:``)+`><span class="lever"></span> Детектировать `+settings.functions[func].func+` </label></div>
+        <ul><li><form action="#"><p><label><input type="checkbox" id="checkbox-`+func+`" `+(settings.functions[func].intercept?``:`disabled`)+` `+(settings.functions[func].replace?`checked`:``)+`/><span>Использовать "тихий режим"</span></label></p></form></li></ul>`;
+        funcItem.innerHTML += html;
+        settingsBody.appendChild(funcItem);
+
+        var switchEl = document.getElementById('switch-'+func);
+        var checkboxEl = document.getElementById('checkbox-'+func);
+
+        (function (switchEl, checkboxEl) {
+            switchEl.addEventListener('click', ()=> {
+                checkboxEl.disabled = !switchEl.checked;
+            });
+        })(switchEl, checkboxEl);
+    }
 
     var saveSettings = document.getElementById('saveSettings');
     saveSettings.addEventListener('click', ()=> {
-        newFunctions = [];
+        newFunctions = {};
 
-        // eval
-        evalObj.intercept = switchEval.checked;
-        evalObj.replace = checkboxEval.checked;
-        newFunctions.push(evalObj);
+        var functionsSettings = document.querySelectorAll('.card.settings > ul > li');
+
+        for (var i = 0; i < functionsSettings.length; i++) {
+            newFunctionBody = {};
+            functionName = functionsSettings[i].dataset.func;
+            newFunctionBody.func = functionsSettings[i].dataset.fullFunc;
+            newFunctionBody.intercept = functionsSettings[i].querySelector('#switch-'+functionName).checked;
+            newFunctionBody.replace = functionsSettings[i].querySelector('#checkbox-'+functionName).checked;
+
+            newFunctions[functionName] = newFunctionBody;
+        }
+
 
         let newSettings = {
             pid: settings.pid,
             platform: settings.platform,
             functions: newFunctions
         };
+
         fs.writeFile(pathToSettings, JSON.stringify(newSettings), (error)=> {
             if (error)
                 M.toast({html: 'Произошла ошибка'});
@@ -260,9 +281,6 @@ function initGlobalSettings() { // TODO: change for multiple functions
         });
     });
 
-    switchEval.addEventListener('click', ()=> {
-        checkboxEval.disabled = !switchEval.checked;
-    });
 }
 
 function showCall(msg) {

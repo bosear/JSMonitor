@@ -1,16 +1,1 @@
-{
-  "pid": "12952",
-  "platform": "node.exe",
-  "functions": {
-    "eval": {
-      "func": "eval",
-      "intercept": true,
-      "replace": false
-    },
-    "new Function": {
-      "func": "new Function",
-      "intercept": true,
-      "replace": false
-    }
-  }
-}
+{"pid":"8180","platform":"node.exe","functions":{"eval":{"func":"eval","intercept":true,"replace":true},"Function":{"func":"new Function","intercept":true,"replace":true}}}
